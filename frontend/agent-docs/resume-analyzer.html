@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Analyzer — Agent Docs</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f9fb;
+    --surface: #ffffff;
+    --border: #e2e6ed;
+    --accent: #0d9e6e;
+    --accent2: #1a6ed8;
+    --text: #3d4657;
+    --muted: #8a95a8;
+    --heading: #111827;
+    --tag-bg: #f0f4f8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; line-height: 1.7; }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex; align-items: center; gap: 12px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted);
+  }
+  .topbar a { color: var(--muted); text-decoration: none; }
+  .topbar a:hover { color: var(--accent); }
+  .topbar .sep { opacity: 0.4; }
+  .topbar .current { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+
+  .hero {
+    border-bottom: 1px solid var(--border);
+    padding: 56px 32px 48px;
+    max-width: 780px;
+  }
+  .agent-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--tag-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 4px 12px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  h1 { font-size: 36px; font-weight: 600; color: var(--heading); letter-spacing: -0.5px; margin-bottom: 12px; }
+  .subtitle { color: var(--muted); font-size: 16px; max-width: 560px; }
+
+  .layout { display: flex; max-width: 1100px; }
+  .sidebar {
+    width: 220px; flex-shrink: 0; padding: 32px 0 32px 32px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    border-right: 1px solid var(--border);
+  }
+  .sidebar-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .sidebar a { display: block; color: var(--muted); text-decoration: none; font-size: 13px; padding: 5px 0; border-left: 2px solid transparent; padding-left: 12px; margin-left: -12px; transition: all 0.15s; }
+  .sidebar a:hover, .sidebar a.active { color: var(--accent); border-left-color: var(--accent); }
+
+  .content { flex: 1; padding: 40px 48px; max-width: 720px; }
+
+  h2 { font-size: 20px; font-weight: 600; color: var(--heading); margin: 40px 0 14px; padding-top: 8px; border-top: 1px solid var(--border); }
+  h2:first-child { margin-top: 0; border-top: none; }
+  h3 { font-size: 14px; font-weight: 600; color: var(--accent2); font-family: 'IBM Plex Mono', monospace; margin: 24px 0 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  p { margin-bottom: 14px; }
+  ul, ol { padding-left: 20px; margin-bottom: 14px; }
+  li { margin-bottom: 6px; }
+
+  .step-grid { display: grid; gap: 12px; margin: 16px 0; }
+  .step {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 16px 20px;
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    background: var(--tag-bg); border: 1px solid var(--accent);
+    color: var(--accent); font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-body strong { color: var(--heading); display: block; margin-bottom: 4px; font-size: 14px; }
+  .step-body p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .output-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 18px 20px; margin-bottom: 10px;
+  }
+  .output-card .label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); margin-bottom: 6px; }
+  .output-card p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .tip {
+    background: #edfaf4; border: 1px solid #b6e9d4; border-left: 3px solid var(--accent);
+    border-radius: 4px; padding: 14px 18px; margin: 16px 0; font-size: 13px;
+  }
+  .tip strong { color: var(--accent); }
+
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .badge {
+    background: var(--tag-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 4px 10px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text);
+  }
+
+  code { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: var(--tag-bg); border: 1px solid var(--border); border-radius: 3px; padding: 2px 6px; color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../index.html">Marketplace</a>
+  <span class="sep">/</span>
+  <a class="current" href="resume-analyzer.html">Resume Analyzer</a>
+  <span class="sep">/</span>
+  <a href="job-recommender.html">Job Recommender</a>
+  <span class="sep">/</span>
+  <a href="cover-letter-gen.html">Cover Letter Generator</a>
+</div>
+
+<div class="hero">
+  <div class="agent-tag"><div class="dot"></div> AGENT · v1.0</div>
+  <h1>Resume Analyzer</h1>
+  <p class="subtitle">Parses, scores, and provides structured feedback on resumes against job descriptions or general hiring standards.</p>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-label">On this page</div>
+    <a href="#overview" class="active">Overview</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="#skills">Skills</a>`n    <a href="#capabilities">Capabilities</a>`n    <a href="#inputs">Inputs</a>
+    <a href="#outputs">Outputs</a>
+    <a href="#tips">Tips</a>
+  </div>
+
+  <div class="content">
+    <h2 id="overview">Overview</h2>
+    <p>The Resume Analyzer agent takes a candidate's resume and optionally a job description, then returns a structured evaluation covering skill match, formatting quality, missing keywords, and an overall fit score.</p>
+    <p>It's designed for both job seekers who want quick feedback and recruiters who want a first-pass filter before manual review.</p>
+
+    <div class="badge-row">
+      <span class="badge">PDF / DOCX / plain text</span>
+      <span class="badge">JD-aware scoring</span>
+      <span class="badge">ATS keyword check</span>
+      <span class="badge">Section-level feedback</span>
+    </div>
+
+    <h2 id="how-it-works">How it works</h2>
+    <div class="step-grid">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Upload Resume</strong><p>Paste resume text or upload a file. The agent extracts sections automatically.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Provide Job Description (optional)</strong><p>Paste the JD to enable role-specific keyword and skill-gap analysis.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Analysis runs</strong><p>The agent scores each section — skills, experience, education, formatting — and checks ATS compatibility.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Get structured feedback</strong><p>Receive a scored report with section-level suggestions and a final fit score (0–100).</p></div></div>
+    </div>
+
+    <h2 id="skills">Skills</h2>
+    <div class="badge-row">
+      <span class="badge">Resume Scoring</span>
+      <span class="badge">Skill Extraction</span>
+      <span class="badge">Feedback Generation</span>
+      <span class="badge">Impact Analysis</span>
+    </div>
+
+    <h2 id="capabilities">Capabilities</h2>
+    <ul>
+      <li>Scores resume quality on a normalized 0-100 scale.</li>
+      <li>Extracts key skills from the provided profile text.</li>
+      <li>Generates practical summary and feedback for improvement.</li>
+      <li>Returns structured breakdown fields for UI rendering.</li>
+    </ul>
+
+    <h2 id="inputs">Inputs</h2>
+    <h3>Required</h3>
+    <ul>
+      <li><code>resume_text</code> — Full resume content as plain text, or an uploaded PDF/DOCX.</li>
+    </ul>
+    <h3>Optional</h3>
+    <ul>
+      <li><code>job_description</code> — Target JD text. Enables role-specific scoring and keyword gap detection.</li>
+      <li><code>mode</code> — <code>general</code> (default) or <code>jd_match</code>. Auto-selected if a JD is provided.</li>
+    </ul>
+
+    <h2 id="outputs">Outputs</h2>
+    <div class="output-card"><div class="label">FIT SCORE</div><p>0–100 numerical score. Above 75 = strong match, 50–74 = moderate, below 50 = needs work.</p></div>
+    <div class="output-card"><div class="label">SECTION SCORES</div><p>Individual scores for Skills, Experience, Education, Formatting, and Keywords.</p></div>
+    <div class="output-card"><div class="label">MISSING KEYWORDS</div><p>List of terms present in the JD but absent from the resume, ranked by importance.</p></div>
+    <div class="output-card"><div class="label">SUGGESTIONS</div><p>Actionable bullet-point feedback per section — what to add, reword, or remove.</p></div>
+
+    <h2 id="tips">Tips for best results</h2>
+    <div class="tip"><strong>Tip:</strong> Always provide the job description. Without it, scoring is generic and misses role-specific nuance.</div>
+    <ul>
+      <li>Use plain text resumes for most accurate parsing. PDF columns can confuse extraction.</li>
+      <li>Keep your resume under 2 pages — the agent flags length issues as a formatting penalty.</li>
+      <li>Run the analyzer after every major resume edit to track your score over time.</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+
+

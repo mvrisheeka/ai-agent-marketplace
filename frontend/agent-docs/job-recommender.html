@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Recommender — Agent Docs</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f9fb;
+    --surface: #ffffff;
+    --border: #e2e6ed;
+    --accent: #d4670a;
+    --accent2: #1a6ed8;
+    --text: #3d4657;
+    --muted: #8a95a8;
+    --heading: #111827;
+    --tag-bg: #f0f4f8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; line-height: 1.7; }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex; align-items: center; gap: 12px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted);
+  }
+  .topbar a { color: var(--muted); text-decoration: none; }
+  .topbar a:hover { color: var(--accent); }
+  .topbar .sep { opacity: 0.4; }
+  .topbar .current { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+
+  .hero {
+    border-bottom: 1px solid var(--border);
+    padding: 56px 32px 48px;
+    max-width: 780px;
+  }
+  .agent-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--tag-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 4px 12px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  h1 { font-size: 36px; font-weight: 600; color: var(--heading); letter-spacing: -0.5px; margin-bottom: 12px; }
+  .subtitle { color: var(--muted); font-size: 16px; max-width: 560px; }
+
+  .layout { display: flex; max-width: 1100px; }
+  .sidebar {
+    width: 220px; flex-shrink: 0; padding: 32px 0 32px 32px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    border-right: 1px solid var(--border);
+  }
+  .sidebar-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .sidebar a { display: block; color: var(--muted); text-decoration: none; font-size: 13px; padding: 5px 0; border-left: 2px solid transparent; padding-left: 12px; margin-left: -12px; transition: all 0.15s; }
+  .sidebar a:hover, .sidebar a.active { color: var(--accent); border-left-color: var(--accent); }
+
+  .content { flex: 1; padding: 40px 48px; max-width: 720px; }
+
+  h2 { font-size: 20px; font-weight: 600; color: var(--heading); margin: 40px 0 14px; padding-top: 8px; border-top: 1px solid var(--border); }
+  h2:first-child { margin-top: 0; border-top: none; }
+  h3 { font-size: 14px; font-weight: 600; color: var(--accent2); font-family: 'IBM Plex Mono', monospace; margin: 24px 0 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  p { margin-bottom: 14px; }
+  ul, ol { padding-left: 20px; margin-bottom: 14px; }
+  li { margin-bottom: 6px; }
+
+  .step-grid { display: grid; gap: 12px; margin: 16px 0; }
+  .step {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 16px 20px;
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    background: var(--tag-bg); border: 1px solid var(--accent);
+    color: var(--accent); font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-body strong { color: var(--heading); display: block; margin-bottom: 4px; font-size: 14px; }
+  .step-body p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .output-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 18px 20px; margin-bottom: 10px;
+  }
+  .output-card .label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); margin-bottom: 6px; }
+  .output-card p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .tip {
+    background: #fff7ed; border: 1px solid #f5cfa0; border-left: 3px solid var(--accent);
+    border-radius: 4px; padding: 14px 18px; margin: 16px 0; font-size: 13px;
+  }
+  .tip strong { color: var(--accent); }
+
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .badge {
+    background: var(--tag-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 4px 10px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text);
+  }
+
+  code { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: var(--tag-bg); border: 1px solid var(--border); border-radius: 3px; padding: 2px 6px; color: var(--accent2); }
+
+  .rec-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 16px 20px; margin-bottom: 10px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .rec-card .title { font-weight: 500; color: var(--heading); font-size: 14px; }
+  .rec-card .meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .score-pill { background: var(--tag-bg); border: 1px solid var(--accent); color: var(--accent); font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 10px; border-radius: 20px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../index.html">Marketplace</a>
+  <span class="sep">/</span>
+  <a href="resume-analyzer.html">Resume Analyzer</a>
+  <span class="sep">/</span>
+  <a class="current" href="job-recommender.html">Job Recommender</a>
+  <span class="sep">/</span>
+  <a href="cover-letter-gen.html">Cover Letter Generator</a>
+</div>
+
+<div class="hero">
+  <div class="agent-tag"><div class="dot"></div> AGENT · v1.0</div>
+  <h1>Job Recommender</h1>
+  <p class="subtitle">Matches your resume and preferences against available roles and returns ranked job recommendations with match explanations.</p>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-label">On this page</div>
+    <a href="#overview" class="active">Overview</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="#skills">Skills</a>`n    <a href="#capabilities">Capabilities</a>`n    <a href="#inputs">Inputs</a>
+    <a href="#outputs">Outputs</a>
+    <a href="#tips">Tips</a>
+  </div>
+
+  <div class="content">
+    <h2 id="overview">Overview</h2>
+    <p>The Job Recommender agent takes your resume and optional preferences (location, role type, salary range) and returns a ranked list of job matches with per-role fit scores and explanations.</p>
+    <p>Recommendations are based on semantic skill matching — not just keyword overlap — so roles that require adjacent skills you haven't listed explicitly can still surface.</p>
+
+    <div class="badge-row">
+      <span class="badge">Semantic skill matching</span>
+      <span class="badge">Role-type filtering</span>
+      <span class="badge">Location-aware</span>
+      <span class="badge">Match explanations</span>
+    </div>
+
+    <h2 id="how-it-works">How it works</h2>
+    <div class="step-grid">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Submit your resume</strong><p>The agent extracts your skills, experience level, domain, and educational background.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Set preferences (optional)</strong><p>Specify role type (full-time/intern/contract), location, remote preference, and seniority level.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Semantic matching runs</strong><p>Your profile is matched against the job index using vector similarity + rule-based filters.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Ranked results returned</strong><p>Top matches are returned with fit scores, match reasons, and skill gap highlights per role.</p></div></div>
+    </div>
+
+    <h2 id="skills">Skills</h2>
+    <div class="badge-row">
+      <span class="badge">Role Matching</span>
+      <span class="badge">Skill Gap Detection</span>
+      <span class="badge">Career Guidance</span>
+      <span class="badge">Job Prioritization</span>
+    </div>
+
+    <h2 id="capabilities">Capabilities</h2>
+    <ul>
+      <li>Returns 5 role recommendations with clear fit reasons.</li>
+      <li>Includes salary range, missing skills, and next steps.</li>
+      <li>Works independently or as a middle step in A2A flow.</li>
+      <li>Falls back to deterministic recommendations when needed.</li>
+    </ul>
+
+    <h2 id="inputs">Inputs</h2>
+    <h3>Required</h3>
+    <ul>
+      <li><code>resume_text</code> — Your resume as plain text or uploaded file.</li>
+    </ul>
+    <h3>Optional</h3>
+    <ul>
+      <li><code>role_type</code> — <code>full-time</code>, <code>internship</code>, or <code>contract</code>.</li>
+      <li><code>location</code> — City, state, or <code>remote</code>.</li>
+      <li><code>seniority</code> — <code>entry</code>, <code>mid</code>, or <code>senior</code>. Auto-inferred from resume if not set.</li>
+      <li><code>top_n</code> — Number of recommendations to return (default: <code>5</code>, max: <code>20</code>).</li>
+    </ul>
+
+    <h2 id="outputs">Outputs</h2>
+    <div class="output-card"><div class="label">RANKED JOB LIST</div><p>Top N roles sorted by fit score, each with company, title, location, and role type.</p></div>
+    <div class="output-card"><div class="label">FIT SCORE PER ROLE</div><p>0–100 score per recommendation. Broken down into skill match %, experience alignment, and seniority fit.</p></div>
+    <div class="output-card"><div class="label">MATCH REASONS</div><p>2–3 sentence explanation of why each role was recommended — which skills matched, what experience was relevant.</p></div>
+    <div class="output-card"><div class="label">SKILL GAPS</div><p>Per-role list of skills the job requires that your resume doesn't cover, to guide upskilling.</p></div>
+
+    <h2 id="tips">Tips for best results</h2>
+    <div class="tip"><strong>Tip:</strong> Set <code>seniority</code> explicitly if you're a recent grad or career-switcher — auto-inference from thin resumes can be inaccurate.</div>
+    <ul>
+      <li>The more detailed your resume, the better the semantic matching. Bullet points with technologies beat vague summaries.</li>
+      <li>Use <code>top_n: 10</code> for the first run to explore the range, then narrow with filters.</li>
+      <li>Combine with the Resume Analyzer: improve your resume score first, then re-run recommendations.</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+
+

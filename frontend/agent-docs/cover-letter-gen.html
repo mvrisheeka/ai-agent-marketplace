@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cover Letter Generator — Agent Docs</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f9fb;
+    --surface: #ffffff;
+    --border: #e2e6ed;
+    --accent: #7c3aed;
+    --accent2: #1a6ed8;
+    --text: #3d4657;
+    --muted: #8a95a8;
+    --heading: #111827;
+    --tag-bg: #f0f4f8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; line-height: 1.7; }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex; align-items: center; gap: 12px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted);
+  }
+  .topbar a { color: var(--muted); text-decoration: none; }
+  .topbar a:hover { color: var(--accent); }
+  .topbar .sep { opacity: 0.4; }
+  .topbar .current { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+
+  .hero {
+    border-bottom: 1px solid var(--border);
+    padding: 56px 32px 48px;
+    max-width: 780px;
+  }
+  .agent-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--tag-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 4px 12px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  h1 { font-size: 36px; font-weight: 600; color: var(--heading); letter-spacing: -0.5px; margin-bottom: 12px; }
+  .subtitle { color: var(--muted); font-size: 16px; max-width: 560px; }
+
+  .layout { display: flex; max-width: 1100px; }
+  .sidebar {
+    width: 220px; flex-shrink: 0; padding: 32px 0 32px 32px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    border-right: 1px solid var(--border);
+  }
+  .sidebar-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .sidebar a { display: block; color: var(--muted); text-decoration: none; font-size: 13px; padding: 5px 0; border-left: 2px solid transparent; padding-left: 12px; margin-left: -12px; transition: all 0.15s; }
+  .sidebar a:hover, .sidebar a.active { color: var(--accent); border-left-color: var(--accent); }
+
+  .content { flex: 1; padding: 40px 48px; max-width: 720px; }
+
+  h2 { font-size: 20px; font-weight: 600; color: var(--heading); margin: 40px 0 14px; padding-top: 8px; border-top: 1px solid var(--border); }
+  h2:first-child { margin-top: 0; border-top: none; }
+  h3 { font-size: 14px; font-weight: 600; color: var(--accent2); font-family: 'IBM Plex Mono', monospace; margin: 24px 0 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  p { margin-bottom: 14px; }
+  ul, ol { padding-left: 20px; margin-bottom: 14px; }
+  li { margin-bottom: 6px; }
+
+  .step-grid { display: grid; gap: 12px; margin: 16px 0; }
+  .step {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 16px 20px;
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    background: var(--tag-bg); border: 1px solid var(--accent);
+    color: var(--accent); font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-body strong { color: var(--heading); display: block; margin-bottom: 4px; font-size: 14px; }
+  .step-body p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .output-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 18px 20px; margin-bottom: 10px;
+  }
+  .output-card .label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); margin-bottom: 6px; }
+  .output-card p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .tip {
+    background: #faf5ff; border: 1px solid #d4b8f9; border-left: 3px solid var(--accent);
+    border-radius: 4px; padding: 14px 18px; margin: 16px 0; font-size: 13px;
+  }
+  .tip strong { color: var(--accent); }
+
+  .tone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+  .tone-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 14px 16px;
+  }
+  .tone-card .t-name { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent); margin-bottom: 4px; }
+  .tone-card p { font-size: 12px; color: var(--muted); margin: 0; }
+
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .badge {
+    background: var(--tag-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: 4px 10px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text);
+  }
+
+  code { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: var(--tag-bg); border: 1px solid var(--border); border-radius: 3px; padding: 2px 6px; color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../index.html">Marketplace</a>
+  <span class="sep">/</span>
+  <a href="resume-analyzer.html">Resume Analyzer</a>
+  <span class="sep">/</span>
+  <a href="job-recommender.html">Job Recommender</a>
+  <span class="sep">/</span>
+  <a class="current" href="cover-letter-gen.html">Cover Letter Generator</a>
+</div>
+
+<div class="hero">
+  <div class="agent-tag"><div class="dot"></div> AGENT · v1.0</div>
+  <h1>Cover Letter Generator</h1>
+  <p class="subtitle">Generates tailored, role-specific cover letters from your resume and job description — in your chosen tone and length.</p>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-label">On this page</div>
+    <a href="#overview" class="active">Overview</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="#skills">Skills</a>`n    <a href="#capabilities">Capabilities</a>`n    <a href="#inputs">Inputs</a>
+    <a href="#outputs">Outputs</a>
+    <a href="#tone">Tone options</a>
+    <a href="#tips">Tips</a>
+  </div>
+
+  <div class="content">
+    <h2 id="overview">Overview</h2>
+    <p>The Cover Letter Generator produces a fully personalized cover letter by cross-referencing your resume with the target job description. It highlights relevant experience, mirrors the JD's language, and structures the letter to maximize first-impression impact.</p>
+    <p>Output is ready-to-send or easy to edit — no more starting from a blank page.</p>
+
+    <div class="badge-row">
+      <span class="badge">JD-aware personalization</span>
+      <span class="badge">Tone control</span>
+      <span class="badge">Length options</span>
+      <span class="badge">Editable output</span>
+    </div>
+
+    <h2 id="how-it-works">How it works</h2>
+    <div class="step-grid">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Provide your resume</strong><p>The agent extracts your top experiences, skills, and achievements to draw from.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Paste the job description</strong><p>The agent identifies key requirements, company tone, and role priorities from the JD.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Set tone and length</strong><p>Choose a tone (professional, conversational, etc.) and target length (short / standard / detailed).</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Cover letter generated</strong><p>A tailored letter is produced with an opening hook, experience bridge, and call to action.</p></div></div>
+    </div>
+
+    <h2 id="skills">Skills</h2>
+    <div class="badge-row">
+      <span class="badge">Professional Writing</span>
+      <span class="badge">Personalization</span>
+      <span class="badge">Role Targeting</span>
+      <span class="badge">Concise Formatting</span>
+    </div>
+
+    <h2 id="capabilities">Capabilities</h2>
+    <ul>
+      <li>Generates short recruiter-friendly cover letters.</li>
+      <li>Uses resume or job context to tailor the message.</li>
+      <li>Maintains clean greeting, body, and sign-off structure.</li>
+      <li>Produces copy-ready final output in the marketplace UI.</li>
+    </ul>
+
+    <h2 id="inputs">Inputs</h2>
+    <h3>Required</h3>
+    <ul>
+      <li><code>resume_text</code> — Your resume as plain text or uploaded file.</li>
+      <li><code>job_description</code> — The full JD of the role you're applying to.</li>
+    </ul>
+    <h3>Optional</h3>
+    <ul>
+      <li><code>tone</code> — Writing tone. Options: <code>professional</code> (default), <code>conversational</code>, <code>enthusiastic</code>, <code>concise</code>.</li>
+      <li><code>length</code> — <code>short</code> (1 para), <code>standard</code> (3 paras, default), or <code>detailed</code> (4–5 paras).</li>
+      <li><code>company_name</code> — Used to personalize the opening. Auto-extracted from JD if not provided.</li>
+      <li><code>hiring_manager</code> — Name for the salutation. Defaults to "Hiring Manager" if unknown.</li>
+    </ul>
+
+    <h2 id="outputs">Outputs</h2>
+    <div class="output-card"><div class="label">COVER LETTER</div><p>Full letter in plain text, ready to copy-paste or export. Includes salutation, body paragraphs, and sign-off.</p></div>
+    <div class="output-card"><div class="label">KEY POINTS USED</div><p>Bullet list of which resume items were pulled in and why — so you understand the agent's choices.</p></div>
+    <div class="output-card"><div class="label">JD ALIGNMENT NOTES</div><p>Short summary of how the letter mirrors the JD's priorities and language, for your reference.</p></div>
+
+    <h2 id="tone">Tone options</h2>
+    <div class="tone-grid">
+      <div class="tone-card"><div class="t-name">professional</div><p>Formal and structured. Best for corporate, finance, legal, and enterprise roles.</p></div>
+      <div class="tone-card"><div class="t-name">conversational</div><p>Warm and direct. Works well for startups, creative agencies, and product teams.</p></div>
+      <div class="tone-card"><div class="t-name">enthusiastic</div><p>High-energy and expressive. Good for early-career applicants and mission-driven orgs.</p></div>
+      <div class="tone-card"><div class="t-name">concise</div><p>Minimal and punchy. Ideal when the JD explicitly asks for brevity or a short intro.</p></div>
+    </div>
+
+    <h2 id="tips">Tips for best results</h2>
+    <div class="tip"><strong>Tip:</strong> Provide the full JD — not just the title. The agent uses requirement language to mirror keywords naturally, which improves ATS pass-through.</div>
+    <ul>
+      <li>If the company has a clear culture (e.g., very casual Slack-first startup), set <code>tone: conversational</code> to match.</li>
+      <li>Run with <code>length: short</code> first to see the essential pitch, then expand to <code>standard</code> if needed.</li>
+      <li>Edit the output — treat it as a strong first draft, not a final submission. Add personal anecdotes the agent can't know.</li>
+      <li>Pair with the Resume Analyzer to make sure your resume and letter are aligned before applying.</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>
+
+
+
+

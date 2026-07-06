@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Agent Marketplace</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="page">
+    <header class="hero">
+      <h1>Agent Marketplace</h1>
+      <p>Discover agents, learn how to use them, and chain two or more with A2A.</p>
+    </header>
+
+    <section id="loginPage" class="panel">
+      <h2>Authenticate</h2>
+      <p>Login to run any agent or A2A flow.</p>
+      <div class="login-row">
+        <input id="username" placeholder="Enter username" />
+        <button onclick="login()">Login</button>
+      </div>
+      <p id="authStatus">Not logged in</p>
+    </section>
+
+    <section id="app" class="panel hidden">
+      <h2>Available Agents</h2>
+      <p>External users can open "How to use" links on every card.</p>
+      <div id="agentsGrid" class="agents-grid"></div>
+
+      <h2>Run Input</h2>
+      <textarea id="userInput" placeholder="Paste resume, profile, or context..."></textarea>
+      <div class="sample-inputs">
+        <span>Sample Inputs:</span>
+        <button class="sample-btn" onclick="fillSampleInput('frontend')">Frontend Profile</button>
+        <button class="sample-btn" onclick="fillSampleInput('backend')">Backend Profile</button>
+        <button class="sample-btn" onclick="fillSampleInput('fresher')">Fresher Profile</button>
+        <button class="sample-btn" onclick="fillSampleInput('fullstack')">Full Stack A2A</button>
+        <button class="sample-btn" onclick="fillSampleInput('leadership')">Senior/Lead Profile</button>
+      </div>
+
+      <div class="actions">
+        <button id="runA2AButton" onclick="runA2A()">Run A2A With Selected Agents</button>
+      </div>
+
+      <div id="loadingBar" class="loading hidden" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <span id="loadingText">Processing...</span>
+      </div>
+
+      <h3>A2A Step Progress</h3>
+      <div id="stepTracker" class="step-tracker">
+        <p class="muted">No steps started yet.</p>
+      </div>
+
+      <div class="output-header">
+        <h3>Response</h3>
+        <div class="output-tools">
+          <button id="copyOutputBtn" onclick="copyOutput()">Copy Response</button>
+          <button id="copyFinalBtn" class="hidden" onclick="copyFinalOutput()">Copy Final Cover Letter</button>
+          <label class="raw-toggle">
+            <input id="rawViewToggle" type="checkbox" onchange="toggleRawView()" />
+            Raw view
+          </label>
+        </div>
+      </div>
+      <div id="output" class="output-content">Ready.</div>
+      <pre id="rawOutput" class="raw-output hidden"></pre>
+    </section>
+  </div>
+
+<script src="script.js"></script>
+</body>
+</html>
